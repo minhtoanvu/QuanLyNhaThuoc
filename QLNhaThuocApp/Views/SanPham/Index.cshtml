@@ -1,0 +1,199 @@
+@model IEnumerable<QLNhaThuoc.DTO.SanPham>
+
+@{
+    ViewBag.Title = "Danh sách Sản Phẩm";
+    // Kế thừa Layout chính được tạo trước đó
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Tuỳ biến style riêng cho bảng dữ liệu trùng khớp với Theme Dark Mode */
+    .table-container {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+    
+    th {
+        background-color: rgba(0, 0, 0, 0.2);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+    
+    tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .action-icons {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .action-icons a {
+        color: var(--text-muted);
+        transition: color 0.2s;
+        font-size: 16px;
+    }
+    
+    .action-icons a:hover {
+        color: var(--primary-color);
+    }
+    
+    .action-icons a.delete-btn:hover {
+        color: #ef4444; /* Màu đỏ cho xóa */
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .status-in-stock {
+        background-color: rgba(16, 185, 129, 0.15);
+        color: #34D399; /* Xanh lá */
+    }
+    
+    .status-low-stock {
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #FBBF24; /* Vàng cam */
+    }
+    
+    .status-out-stock {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #F87171; /* Đỏ */
+    }
+    
+    .price-text {
+        font-weight: 600;
+        color: #818CF8; /* Màu nổi bật cho giá */
+    }
+</style>
+
+<div class="header-actions">
+    <div>
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Quản Lý Sản Phẩm (Kho Thuốc)</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">Xem và quản lý danh sách toàn bộ mặt hàng thuốc, thiết bị y tế lưu trữ.</p>
+    </div>
+    <!-- Nút thêm mới -->
+    <a href="@Url.Action("Create")" class="btn-primary">
+        <i class="fa-solid fa-plus"></i> Thêm Sản Phẩm Mới
+    </a>
+</div>
+
+<!-- Lỗi hiện ra khi kết nối DB lỗi từ Controller -->
+@if (ViewBag.ErrorMessage != null)
+{
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <i class="fa-solid fa-circle-exclamation" style="margin-right: 8px;"></i> @ViewBag.ErrorMessage
+    </div>
+}
+
+<!-- Bảng hiển thị ADO.NET Fetch -->
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Mã SP</th>
+                <th>Tên Thuốc / Sản Phẩm</th>
+                <th>Đơn Vị</th>
+                <th>Giá Bán</th>
+                <th>Tồn Kho</th>
+                <th>Trạng Thái</th>
+                <th style="width: 120px;">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong style="color: var(--text-muted);">@item.MaSP</strong></td>
+                        <td style="font-weight: 600; color: #F8FAFC;">@item.TenSP</td>
+                        <td><span style="color: var(--text-muted);">@item.DonViTinh</span></td>
+                        <td class="price-text">@item.GiaBan.ToString("N0") ₫</td>
+                        <td>@item.SoLuongTonKho</td>
+                        <td>
+                            @if (item.SoLuongTonKho > 20)
+                            {
+                                <span class="status-badge status-in-stock">Còn hàng</span>
+                            }
+                            else if (item.SoLuongTonKho > 0)
+                            {
+                                <span class="status-badge status-low-stock">Sắp hết</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-out-stock">Hết hàng</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="action-icons">
+                                <a href="@Url.Action("Edit", new { id = item.MaSP })" title="Chỉnh sửa"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a href="@Url.Action("Details", new { id = item.MaSP })" title="Chi tiết"><i class="fa-solid fa-circle-info"></i></a>
+                                <a href="@Url.Action("Delete", new { id = item.MaSP })" class="delete-btn" title="Xóa"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 50px; color: var(--text-muted);">
+                        <i class="fa-solid fa-box-open" style="font-size: 48px; margin-bottom: 20px; opacity: 0.4;"></i>
+                        <p style="font-size: 16px;">Chưa có sản phẩm nào trong cơ sở dữ liệu.</p>
+                        <p style="font-size: 13px; margin-top: 8px;">Vui lòng thêm sản phẩm mới hoặc kiểm tra kết nối với DB.</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

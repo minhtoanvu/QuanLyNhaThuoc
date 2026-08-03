@@ -1,0 +1,179 @@
+@using QLNhaThuoc.DTO
+@model IEnumerable<BaoCaoSuCo>
+
+@{
+    ViewBag.Title = "Quản lý Báo Cáo Sự Cố";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .table-container {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+    
+    th {
+        background-color: rgba(0, 0, 0, 0.2);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+    
+    tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .action-icons a {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #60A5FA;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .action-icons a:hover {
+        background-color: #3B82F6;
+        color: white;
+    }
+    
+    .badge-tt {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+</style>
+
+<div class="header-actions">
+    <div>
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-headset me-2 text-primary"></i>Hỗ Trợ & Sự Cố</h2>
+        <p style="color: var(--text-muted); font-size: 14px;">Quản lý các phản ánh chất lượng thuốc, khiếu nại khách hàng, sai lệch hóa đơn.</p>
+    </div>
+    <a href="@Url.Action("Create")" class="btn-primary">
+        <i class="fa-solid fa-plus"></i> Tạo Báo Cáo Mới
+    </a>
+</div>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <i class="fa-solid fa-circle-exclamation" style="margin-right: 8px;"></i> @ViewBag.ErrorMessage
+    </div>
+}
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Mã Ticket</th>
+                <th>Khách Hàng / HĐ</th>
+                <th>Tóm Tắt Nội Dung</th>
+                <th>Thời Gian Ghi Nhận</th>
+                <th>Trạng Thái</th>
+                <th style="width: 120px;">Xử Lý</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong style="color: var(--text-muted);">@item.MaBCSC</strong></td>
+                        <td>
+                            <div style="font-weight: 600; color: #F8FAFC;">@item.TenKhachHang</div>
+                            @if(!string.IsNullOrEmpty(item.MaHD))
+                            {
+                                <div style="font-size: 12px; color: #818CF8;"><i class="fa-solid fa-receipt me-1"></i>@item.MaHD</div>
+                            }
+                        </td>
+                        <td>
+                            <span style="color: var(--text-muted); display: inline-block; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                @item.NoiDung
+                            </span>
+                        </td>
+                        <td>@item.NgayGui.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @if (item.TrangThai == "Chờ xử lý")
+                            {
+                                <span class="badge-tt" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">@item.TrangThai</span>
+                            }
+                            else if(item.TrangThai == "Đã xác nhận")
+                            {
+                                <span class="badge-tt" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">@item.TrangThai</span>
+                            }
+                            else
+                            {
+                                <span class="badge-tt" style="background: rgba(239, 68, 68, 0.15); color: #F87171;">@item.TrangThai</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="action-icons">
+                                <a href="@Url.Action("Process", new { id = item.MaBCSC })" title="Xem & Xử lý">
+                                    @(item.TrangThai == "Chờ xử lý" ? "Xử Lý" : "Chi Tiết")
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 50px; color: var(--text-muted);">
+                        <i class="fa-solid fa-check-double" style="font-size: 48px; margin-bottom: 20px; opacity: 0.4;"></i>
+                        <p style="font-size: 16px;">Tuyệt vời, không có sự cố nào đang chờ xử lý!</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

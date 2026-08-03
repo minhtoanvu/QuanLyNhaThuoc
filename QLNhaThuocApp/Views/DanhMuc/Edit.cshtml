@@ -1,0 +1,46 @@
+@model QLNhaThuoc.DTO.DanhMuc
+
+@{
+    ViewBag.Title = "Chỉnh sửa Danh Mục: " + Model.TenDM;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-8">
+        <div class="card bg-dark border-secondary shadow-sm rounded-4">
+            <div class="card-header border-secondary p-4 pb-0">
+                <h5 class="text-white mb-0"><i class="fa-solid fa-pen-to-square me-2 text-warning"></i>Cập Nhật Danh Mục: @Model.MaDM</h5>
+            </div>
+            <div class="card-body p-4">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+                    @Html.HiddenFor(model => model.MaDM)
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.TenDM, "Tên Danh Mục Phân Loại", htmlAttributes: new { @class = "form-label text-muted small" })
+                        @Html.EditorFor(model => model.TenDM, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", @required = "required" } })
+                        @Html.ValidationMessageFor(model => model.TenDM, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.MoTa, "Mô Tả", htmlAttributes: new { @class = "form-label text-muted small" })
+                        @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control text-white border-secondary bg-transparent", rows = 4 })
+                    </div>
+
+                    <hr class="border-secondary my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Quay Lại
+                        </a>
+                        <button type="submit" class="btn btn-warning px-4 text-dark fw-bold">
+                            <i class="fa-solid fa-save me-2"></i> Cập Nhật Danh Mục
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

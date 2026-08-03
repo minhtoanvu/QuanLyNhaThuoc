@@ -1,0 +1,5 @@
+TenDangNhap MatKhau ChucVu
+----------- ------- ------
+admin 123456 Admin
+
+(1 rows affected)

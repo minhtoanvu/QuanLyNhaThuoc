@@ -1,0 +1,49 @@
+@model dynamic
+
+@{
+    ViewBag.Title = "Ghi Nhận Sự Cố / Phản Hồi Khách Hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-8">
+        <div class="card bg-dark border-secondary shadow-sm rounded-4">
+            <div class="card-header border-secondary p-4 pb-0">
+                <h5 class="text-white mb-0"><i class="fa-solid fa-headset me-2 text-primary"></i>Mở Ticket Báo Cáo Sự Cố Mới</h5>
+            </div>
+            <div class="card-body p-4">
+                @using (Html.BeginForm("Create", "SuCo", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Khách Hàng Phản Hồi (Nếu có)</label>
+                        @Html.DropDownList("MaKH", (SelectList)ViewBag.MaKH, "-- Khách Vãng Lai --", new { @class = "form-select text-white border-secondary bg-transparent" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Mã Hóa Đơn Tranh Chấp (Tùy chọn)</label>
+                        <input type="text" name="MaHD" class="form-control text-white border-secondary bg-transparent" placeholder="VD: HD2404123456" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Nội Dung Sự Cố / Phản Hồi <span class="text-danger">*</span></label>
+                        <textarea name="NoiDung" class="form-control text-white border-secondary bg-transparent" rows="5" required placeholder="Ghi nhận chi tiết phàn nàn của khách hàng..."></textarea>
+                    </div>
+
+                    <hr class="border-secondary my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Trở Về Danh Sách
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Gửi Báo Cáo Sự Cố
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

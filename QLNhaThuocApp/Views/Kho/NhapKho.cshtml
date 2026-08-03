@@ -1,0 +1,268 @@
+@{
+    ViewBag.Title = "Lập Phiếu Nhập Kho";
+}
+
+<div class="row g-4">
+    <!-- Left Pane: General Info -->
+    <div class="col-12 col-lg-4">
+        <div class="card bg-dark border-secondary shadow-sm rounded-4 h-100">
+            <div class="card-header border-secondary bg-transparent p-4 pb-0">
+                <h5 class="text-white mb-0"><i class="fa-solid fa-file-invoice me-2 text-primary"></i>Thông Tin Phiếu Nhập</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Thời gian nhập</label>
+                    <input type="text" class="form-control text-white border-secondary bg-transparent" value="@DateTime.Now.ToString("dd/MM/yyyy HH:mm")" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Chọn Kho Hàng <span class="text-danger">*</span></label>
+                    <select id="selKho" class="form-select text-white border-secondary bg-transparent">
+                        <option value="">-- Chọn kho nhập --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Nhà Cung Cấp <span class="text-danger">*</span></label>
+                    <select id="selNcc" class="form-select text-white border-secondary bg-transparent">
+                        <option value="">-- Chọn nhà cung cấp --</option>
+                    </select>
+                </div>
+                <hr class="border-secondary my-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Tổng mặt hàng:</span>
+                    <span class="text-white fw-bold fs-5" id="totalItems">0</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-muted">Tổng tiền nhập:</span>
+                    <span class="text-success fw-bold fs-4" id="totalAmount">0đ</span>
+                </div>
+                
+                <button class="btn btn-primary w-100 mt-4 py-3 fw-bold rounded-3" id="btnSave">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> HOÀN TẤT NHẬP KHO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Pane: Item Details -->
+    <div class="col-12 col-lg-8">
+        <div class="card bg-dark border-secondary shadow-sm rounded-4 h-100">
+            <div class="card-header border-secondary bg-transparent p-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="text-white mb-0"><i class="fa-solid fa-boxes-packing me-2 text-primary"></i>Chi Tiết Mặt Hàng</h5>
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" id="btnOpenAddModal">
+                    <i class="fa-solid fa-plus"></i> Thêm Hàng
+                </button>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle border-secondary">
+                        <thead class="text-muted small">
+                            <tr>
+                                <th>SẢN PHẨM</th>
+                                <th>SỐ LƯỢNG</th>
+                                <th>ĐƠN GIÁ NHẬP</th>
+                                <th>HẠN SỬ DỤNG</th>
+                                <th class="text-end">THÀNH TIÊN</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblItems">
+                            <tr id="emptyRow">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-box-open fs-1 mb-3 opacity-25"></i>
+                                    <p>Chưa có mặt hàng nào. Bấm "Thêm Hàng" để bắt đầu.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm Mặt Hàng - Đặt ở cuối body để tránh lỗi z-index/overflow -->
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-secondary" style="background-color: #1E293B;">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-white" id="addItemModalLabel"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Thêm Thuốc Lô Mới</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body text-white">
+        <div class="mb-3">
+            <label class="form-label text-muted small">Sản phẩm <span class="text-danger">*</span></label>
+            <select id="modalSP" class="form-select text-white border-secondary" style="background-color: #0F172A;"></select>
+        </div>
+        <div class="row">
+            <div class="col-6 mb-3">
+                <label class="form-label text-muted small">Số lượng <span class="text-danger">*</span></label>
+                <input type="number" id="modalQty" class="form-control text-white border-secondary" style="background-color: #0F172A;" min="1" value="1">
+            </div>
+            <div class="col-6 mb-3">
+                <label class="form-label text-muted small">Đơn giá nhập <span class="text-danger">*</span></label>
+                <input type="number" id="modalPrice" class="form-control text-white border-secondary" style="background-color: #0F172A;" min="0" value="0">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small">Hạn sử dụng <span class="text-danger">*</span></label>
+            <input type="date" id="modalDate" class="form-control text-white border-secondary" style="background-color: #0F172A; color-scheme: dark;">
+        </div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary px-4" id="btnConfirmAdd"><i class="fa-solid fa-check me-1"></i>Xác nhận Thêm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+    let listSP = [];
+    let cart = [];
+    let addItemModal = null;
+    
+    const formatMoney = (amount) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Khởi tạo modal Bootstrap SAU KHI DOM sẵn sàng
+        var addItemModalEl = document.getElementById('addItemModal');
+        document.body.appendChild(addItemModalEl); // Di chuyển modal ra ngoài body để tránh lỗi z-index và đơ màn hình!
+        addItemModal = new bootstrap.Modal(addItemModalEl, { backdrop: true, keyboard: true });
+
+        addItemModalEl.addEventListener('hidden.bs.modal', function () {
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+
+        // Nút mở modal
+        document.getElementById('btnOpenAddModal').addEventListener('click', function () {
+            // Reset form mỗi lần mở
+            document.getElementById('modalQty').value = 1;
+            document.getElementById('modalPrice').value = 0;
+            document.getElementById('modalDate').value = '';
+            addItemModal.show();
+        });
+
+        // Load dữ liệu ban đầu
+        $.get('/Kho/GetDanhSachNhap', function (res) {
+            res.kho.forEach(k => $('#selKho').append(`<option value="${k.id}">${k.name}</option>`));
+            res.ncc.forEach(c => $('#selNcc').append(`<option value="${c.id}">${c.name}</option>`));
+
+            listSP = res.sp;
+            listSP.forEach(s => $('#modalSP').append(`<option value="${s.id}">${s.name} (${s.unit})</option>`));
+        }).fail(function () {
+            alert('Lỗi khi tải dữ liệu kho. Vui lòng tải lại trang.');
+        });
+
+        // Xác nhận thêm hàng
+        document.getElementById('btnConfirmAdd').addEventListener('click', function () {
+            var id = document.getElementById('modalSP').value;
+            var name = document.getElementById('modalSP').options[document.getElementById('modalSP').selectedIndex].text;
+            var qty = parseInt(document.getElementById('modalQty').value);
+            var price = parseFloat(document.getElementById('modalPrice').value);
+            var date = document.getElementById('modalDate').value;
+
+            if (!id) { alert("Vui lòng chọn sản phẩm."); return; }
+            if (isNaN(qty) || qty <= 0) { alert("Số lượng phải lớn hơn 0."); return; }
+            if (isNaN(price) || price < 0) { alert("Đơn giá không hợp lệ."); return; }
+            if (!date) { alert("Vui lòng nhập hạn sử dụng."); return; }
+
+            cart.push({ id, name, qty, price, date });
+            renderTable();
+            addItemModal.hide();
+        });
+
+        // Hoàn tất nhập kho
+        document.getElementById('btnSave').addEventListener('click', function () {
+            if (cart.length === 0) { alert("Chưa có mặt hàng nào."); return; }
+            if (!document.getElementById('selKho').value) { alert("Vui lòng chọn Kho."); return; }
+            if (!document.getElementById('selNcc').value) { alert("Vui lòng chọn Nhà Cung Cấp."); return; }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ĐANG LƯU...';
+
+            const payload = {
+                MaKho: document.getElementById('selKho').value,
+                MaNCC: document.getElementById('selNcc').value,
+                Items: cart.map(c => ({
+                    MaSP: c.id,
+                    SoLuong: c.qty,
+                    DonGiaNhap: c.price,
+                    HanSuDung: c.date
+                }))
+            };
+
+            fetch('/Kho/ProcessNhapKho', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert("Nhập kho thành công! Chuyển hướng tới phiếu nhập.");
+                    window.location.href = '/Kho/XemPhieuNhap/' + res.maPNK;
+                } else {
+                    alert("Lỗi: " + (res.message || "Không lưu được."));
+                }
+            })
+            .catch(err => alert("Lỗi kết nối: " + err.message))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i> HOÀN TẤT NHẬP KHO';
+            });
+        });
+    });
+
+    window.removeItem = function (index) {
+        cart.splice(index, 1);
+        renderTable();
+    };
+
+    function renderTable() {
+        const tbody = document.getElementById('tblItems');
+        if (cart.length === 0) {
+            tbody.innerHTML = `
+                <tr id="emptyRow">
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-box-open fs-1 mb-3 opacity-25"></i>
+                        <p>Chưa có mặt hàng nào. Bấm "Thêm Hàng" để bắt đầu.</p>
+                    </td>
+                </tr>`;
+            document.getElementById('totalItems').textContent = '0';
+            document.getElementById('totalAmount').textContent = '0đ';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        let sum = 0;
+        cart.forEach((c, index) => {
+            sum += c.qty * c.price;
+            let d = new Date(c.date);
+            let ds = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-white fw-medium">${c.name}</td>
+                <td><span class="badge bg-secondary">${c.qty}</span></td>
+                <td>${formatMoney(c.price)}</td>
+                <td>${ds}</td>
+                <td class="text-end fw-bold text-success">${formatMoney(c.qty * c.price)}</td>
+                <td class="text-end">
+                    <button class="btn btn-sm text-danger" onclick="removeItem(${index})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('totalItems').textContent = cart.length;
+        document.getElementById('totalAmount').textContent = formatMoney(sum);
+    }
+</script>
+}

@@ -1,0 +1,85 @@
+@model QLNhaThuoc.DTO.SanPham
+
+@{
+    ViewBag.Title = "Chỉnh Sửa Sản Phẩm: " + Model.TenSP;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var donViTinhList = new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Viên", Value = "Viên" },
+        new SelectListItem { Text = "Vỉ", Value = "Vỉ" },
+        new SelectListItem { Text = "Hộp", Value = "Hộp" },
+        new SelectListItem { Text = "Chai", Value = "Chai" },
+        new SelectListItem { Text = "Lọ", Value = "Lọ" },
+        new SelectListItem { Text = "Ống", Value = "Ống" },
+        new SelectListItem { Text = "Gói", Value = "Gói" },
+        new SelectListItem { Text = "Tuýp", Value = "Tuýp" }
+    };
+}
+
+<div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-8">
+        <div class="card bg-dark border-secondary shadow-sm rounded-4">
+            <div class="card-header border-secondary p-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="text-white mb-0"><i class="fa-solid fa-pen-to-square me-2 text-warning"></i>Chỉnh Sửa Sản Phẩm: @Model.MaSP</h5>
+            </div>
+            <div class="card-body p-4">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+                    @Html.HiddenFor(model => model.MaSP)
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.TenSP, "Tên Sản Phẩm", htmlAttributes: new { @class = "form-label text-muted small" })
+                        @Html.EditorFor(model => model.TenSP, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", @required = "required" } })
+                        @Html.ValidationMessageFor(model => model.TenSP, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.MaDM, "Danh Mục", htmlAttributes: new { @class = "form-label text-muted small" })
+                        @Html.DropDownList("MaDM", null, "-- Chọn Danh Mục --", htmlAttributes: new { @class = "form-select text-white border-secondary bg-transparent" })
+                        @Html.ValidationMessageFor(model => model.MaDM, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(model => model.DonViTinh, "Đơn Vị Tính", htmlAttributes: new { @class = "form-label text-muted small" })
+                            @Html.DropDownListFor(model => model.DonViTinh, donViTinhList, "-- Chọn Đơn Vị Tính --", new { @class = "form-select text-white border-secondary bg-transparent" })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(model => model.GiaBan, "Giá Bán", htmlAttributes: new { @class = "form-label text-muted small" })
+                            @Html.EditorFor(model => model.GiaBan, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", type = "number", min = "0" } })
+                            @Html.ValidationMessageFor(model => model.GiaBan, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.ThanhPhan, "Thành Phần", htmlAttributes: new { @class = "form-label text-muted small" })
+                        @Html.TextAreaFor(model => model.ThanhPhan, new { @class = "form-control text-white border-secondary bg-transparent", rows = 3 })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.MoTa, "Mô Tả", htmlAttributes: new { @class = "form-label text-muted small" })
+                        @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control text-white border-secondary bg-transparent", rows = 3 })
+                    </div>
+                    
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.SoLuongTonKho, "Tồn Kho (Nên cập nhật qua Nhập/Xuất)", htmlAttributes: new { @class = "form-label text-warning small" })
+                        @Html.EditorFor(model => model.SoLuongTonKho, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", type = "number", min = "0" } })
+                    </div>
+
+                    <hr class="border-secondary my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Quay Lại
+                        </a>
+                        <button type="submit" class="btn btn-warning px-4">
+                            <i class="fa-solid fa-save me-2"></i> Cập Nhật
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

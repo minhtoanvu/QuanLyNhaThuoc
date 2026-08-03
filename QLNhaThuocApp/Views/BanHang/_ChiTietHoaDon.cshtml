@@ -1,0 +1,36 @@
+@model List<QLNhaThuoc.DTO.ChiTietHoaDon>
+
+<div class="table-responsive">
+    <table class="table table-dark table-hover align-middle border-secondary mb-0">
+        <thead class="text-muted small">
+            <tr>
+                <th>TÊN SẢN PHẨM</th>
+                <th class="text-center">SỐ LƯỢNG</th>
+                <th class="text-end">ĐƠN GIÁ</th>
+                <th class="text-end">THÀNH TIỀN</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">
+                        Không có thông tin chi tiết.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-white fw-medium">@(item.SanPham?.TenSP ?? item.MaSP)</td>
+                        <td class="text-center"><span class="badge bg-secondary">@item.SoLuong</span></td>
+                        <td class="text-end">@item.DonGia.ToString("N0")đ</td>
+                        <td class="text-end text-success fw-bold">@item.ThanhTien.ToString("N0")đ</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

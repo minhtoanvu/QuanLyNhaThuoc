@@ -1,0 +1,97 @@
+@model QLNhaThuoc.DTO.NhanVien
+
+@{
+    ViewBag.Title = "Thêm Nhân Viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-10">
+        <div class="card bg-dark border-secondary shadow-sm rounded-4 mt-3">
+            <div class="card-header border-secondary p-4 pb-0">
+                <h5 class="text-white mb-0"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Hồ Sơ Nhân Sự Mới</h5>
+            </div>
+            <div class="card-body p-4">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-4" })
+
+                    <h6 class="text-info border-bottom border-secondary pb-2 mb-3"><i class="fa-solid fa-address-card me-2"></i>Thông Tin Chuyên Môn</h6>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Mã Nhân Viên (Hệ thống tự cấp nếu trống)</label>
+                            @Html.EditorFor(model => model.MaNV, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", placeholder="VD: NV007" } })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Chức Vụ <span class="text-danger">*</span></label>
+                            <select name="ChucVu" class="form-select text-white border-secondary bg-transparent">
+                                <option value="" style="background:var(--card-bg)">-- Chọn chức vụ --</option>
+                                <option value="Bán Hàng" style="background:var(--card-bg)">Bán Hàng / Dược Sĩ</option>
+                                <option value="Thủ Kho" style="background:var(--card-bg)">Thủ Kho</option>
+                                <option value="Quản lý" style="background:var(--card-bg)">Cửa Hàng Trưởng / Quản Lý</option>
+                            </select>
+                            @Html.ValidationMessageFor(model => model.ChucVu, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted small">Họ đệm <span class="text-danger">*</span></label>
+                            @Html.EditorFor(model => model.Ho, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", @required = "required" } })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted small">Tên chính <span class="text-danger">*</span></label>
+                            @Html.EditorFor(model => model.Ten, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", @required = "required" } })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted small">Lương cơ bản (VND)</label>
+                            @Html.EditorFor(model => model.Luong, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", type = "number" } })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Số điện thoại</label>
+                            @Html.EditorFor(model => model.SoDT, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent" } })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Email</label>
+                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent" } })
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label text-muted small">Địa chỉ</label>
+                            @Html.EditorFor(model => model.DiaChi, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent" } })
+                        </div>
+                    </div>
+
+                    <h6 class="text-warning border-bottom border-secondary pb-2 mb-3 mt-4"><i class="fa-solid fa-key me-2"></i>Tài Khoản Truy Cập</h6>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Tên đăng nhập <span class="text-danger">*</span></label>
+                            @Html.EditorFor(model => model.TenDangNhap, new { htmlAttributes = new { @class = "form-control text-white border-secondary bg-transparent", @required = "required" } })
+                            @Html.ValidationMessageFor(model => model.TenDangNhap, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Mật khẩu cấp tạm <span class="text-danger">*</span></label>
+                            @Html.PasswordFor(model => model.MatKhau, new { @class = "form-control text-white border-secondary bg-transparent", @required = "required" })
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Trở Về
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fa-solid fa-save me-2"></i> Cấp Hồ Sơ & Tài Khoản
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

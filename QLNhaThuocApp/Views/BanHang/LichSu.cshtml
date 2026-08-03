@@ -1,0 +1,65 @@
+@model List<QLNhaThuoc.DTO.HoaDon>
+@{
+    ViewBag.Title = "Lịch Sử Hóa Đơn";
+}
+
+<div class="card bg-dark border-secondary shadow-sm rounded-4">
+    <div class="card-header border-secondary bg-transparent p-4 d-flex justify-content-between align-items-center">
+        <h5 class="text-white mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Lịch Sử Hóa Đơn</h5>
+        <a href="/BanHang" class="btn btn-primary btn-sm rounded-pill px-3">
+            <i class="fa-solid fa-plus me-1"></i> Lập Hóa Đơn Mới
+        </a>
+    </div>
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle border-secondary">
+                <thead class="text-muted small">
+                    <tr>
+                        <th>MÃ HÓA ĐƠN</th>
+                        <th>NGÀY LẬP</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th class="text-end">TỔNG TIỀN</th>
+                        <th class="text-center">HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-folder-open fs-1 mb-3 opacity-25"></i>
+                                <p>Chưa có hóa đơn nào được lập.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var hd in Model)
+                        {
+                            <tr>
+                                <td class="text-primary fw-bold">@hd.MaHD</td>
+                                <td>@hd.NgayXuatHD.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>
+                                    @if (hd.KhachHang != null)
+                                    {
+                                        <span>@hd.KhachHang.Ho @hd.KhachHang.Ten</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Khách lẻ</span>
+                                    }
+                                </td>
+                                <td class="text-end fw-bold text-success">@hd.TongTien.ToString("N0")đ</td>
+                                <td class="text-center">
+                                    <a href="/BanHang/XemHoaDon/@hd.MaHD" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fa-solid fa-eye me-1"></i> Chi Tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

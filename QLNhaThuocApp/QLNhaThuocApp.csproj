@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QLNhaThuoc.BUS\QLNhaThuoc.BUS.csproj" />
+    <ProjectReference Include="..\QLNhaThuoc.DTO\QLNhaThuoc.DTO.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Hệ Thống Quản Lý Nhà Thuốc</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #0F172A;
+            --sidebar-bg: #1E293B;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: #334155;
+            --card-bg: #1E293B;
+            --transition: all 0.3s ease;
+        }
+
+        .no-caret::after {
+            display: none !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        option {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Wrapper */
+        #wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: var(--sidebar-bg);
+            color: var(--text-main);
+            transition: var(--transition);
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1040;
+        }
+
+        #sidebar.active {
+            margin-left: -250px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header .brand-icon {
+            font-size: 28px;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 8px rgba(79, 70, 229, 0.4));
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #F8FAFC, #A5B4FC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        #sidebar ul p {
+            color: var(--text-muted);
+            padding: 10px;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        #sidebar ul li a i {
+            width: 30px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        #sidebar ul li a:hover, #sidebar ul li a.active {
+            color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+            border-left-color: var(--primary-color);
+        }
+
+        /* Page Content */
+        #content {
+            width: 100%;
+            min-height: 100vh;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background-color: rgba(30, 41, 59, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            z-index: 1030;
+        }
+        
+        .navbar-custom .navbar-brand {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+        
+        #sidebarCollapse {
+            color: var(--text-main);
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+        }
+        
+        #sidebarCollapse:hover {
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 5px 10px;
+            border-radius: 30px;
+            transition: var(--transition);
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background-color: rgba(255,255,255,0.08);
+            border-color: var(--border-color);
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            background-image: radial-gradient(circle at top right, rgba(79, 70, 229, 0.08), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(79, 70, 229, 0.05), transparent 30%);
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Breakpoints */
+        @@media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                height: 100vh;
+                margin-left: -250px;
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+            #content {
+                width: 100%;
+            }
+        }
+
+        /* ===== FIX: Bootstrap Modal bị đơ do body overflow-x: hidden ===== */
+        /* Khi modal mở, body cần có padding-right để tránh layout shift */
+        body.modal-open {
+            overflow: hidden !important;
+            /* Override overflow-x: hidden để modal backdrop hoạt động đúng */
+        }
+
+        /* Đảm bảo modal backdrop hiển thị đúng layer */
+        .modal-backdrop {
+            z-index: 1049 !important;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        /* Fix select dropdown trong modal hiển thị đúng màu dark */
+        .modal select.form-select option {
+            background-color: #0F172A;
+            color: #F8FAFC;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <nav id="sidebar">
+                <div class="sidebar-header d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-capsules brand-icon"></i>
+                    <h3>PharmaManager</h3>
+                </div>
+
+                <ul class="list-unstyled components mt-3">
+                    <li>
+                        <a href="~/" class="nav-link-item">
+                            <i class="fa-solid fa-chart-pie"></i> Tổng Quan
+                        </a>
+                    </li>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý"))
+                    {
+                        <li>
+                            <a href="~/DanhMuc" class="nav-link-item">
+                                <i class="fa-solid fa-layer-group"></i> Danh Mục Thuốc
+                            </a>
+                        </li>
+                    }
+                    
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý") || User.IsInRole("Thủ Kho"))
+                    {
+                        <li>
+                            <a href="~/SanPham" class="nav-link-item">
+                                <i class="fa-solid fa-pills"></i> Kho Sản Phẩm
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý") || User.IsInRole("Bán Hàng"))
+                    {
+                        <li>
+                            <a href="~/BanHang" class="nav-link-item">
+                                <i class="fa-solid fa-file-invoice-dollar"></i> Lập Hóa Đơn
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý") || User.IsInRole("Thủ Kho"))
+                    {
+                        <li>
+                            <a href="~/Kho/XuatKho" class="nav-link-item">
+                                <i class="fa-solid fa-dolly"></i> Xuất Kho
+                            </a>
+                        </li>
+                        <li>
+                            <a href="~/Kho/NhapKho" class="nav-link-item">
+                                <i class="fa-solid fa-boxes-stacked"></i> Nhập Kho
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý") || User.IsInRole("Bán Hàng"))
+                    {
+                        <li>
+                            <a href="~/KhachHang" class="nav-link-item">
+                                <i class="fa-solid fa-users"></i> Khách Hàng
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý"))
+                    {
+                        <li>
+                            <a href="~/NhanVien" class="nav-link-item">
+                                <i class="fa-solid fa-user-doctor"></i> Nhân Sự
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Quản lý") || User.IsInRole("Bán Hàng"))
+                    {
+                        <li>
+                            <a href="~/SuCo" class="nav-link-item">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Sự Cố & Đổi Trả
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
+        <!-- Page Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+                <div class="container-fluid">
+                    @if (User?.Identity?.IsAuthenticated == true) {
+                        <button type="button" id="sidebarCollapse" class="btn">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                    }
+                    
+                    <span class="navbar-brand ms-3 mb-0 h1 d-none d-md-block">@ViewBag.Title</span>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <!-- Notifications -->
+                            <div class="dropdown me-4">
+                                <div class="position-relative cursor-pointer text-muted dropdown-toggle no-caret" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-bell fs-5"></i>
+                                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                        <span class="visually-hidden">New alerts</span>
+                                    </span>
+                                </div>
+                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-secondary p-0" aria-labelledby="notifDropdown" style="width: 320px; background-color: #1E293B;">
+                                    <li class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0 text-white fw-bold">Thông Báo</h6>
+                                        <span class="badge bg-danger small">3 mới</span>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item p-3 border-bottom border-secondary-subtle" href="#" style="white-space: normal;">
+                                            <div class="d-flex align-items-start">
+                                                <div class="bg-warning text-dark rounded-circle p-2 me-2" style="font-size: 0.85rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-1 text-white small fw-bold">Cảnh báo tồn kho</p>
+                                                    <p class="mb-0 text-muted extra-small" style="font-size: 0.78rem;">Thuốc hạ sốt Paracetamol còn dưới 10 hộp trong kho.</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item p-3 border-bottom border-secondary-subtle" href="#" style="white-space: normal;">
+                                            <div class="d-flex align-items-start">
+                                                <div class="bg-primary text-white rounded-circle p-2 me-2" style="font-size: 0.85rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fa-solid fa-file-invoice"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-1 text-white small fw-bold">Phiếu nhập mới</p>
+                                                    <p class="mb-0 text-muted extra-small" style="font-size: 0.78rem;">Phiếu nhập kho PNK26052301 đã được duyệt hoàn thành.</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item p-3" href="#" style="white-space: normal;">
+                                            <div class="d-flex align-items-start">
+                                                <div class="bg-info text-white rounded-circle p-2 me-2" style="font-size: 0.85rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fa-solid fa-headset"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-1 text-white small fw-bold">Sự cố mới báo cáo</p>
+                                                    <p class="mb-0 text-muted extra-small" style="font-size: 0.78rem;">Có sự cố báo cáo lỗi thuốc hỏng mới từ bệnh nhân.</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="text-center p-2 border-top border-secondary">
+                                        <a href="#" class="text-primary small text-decoration-none fw-bold">Xem tất cả thông báo</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- User Profile -->
+                            <div class="dropdown">
+                                <div class="user-profile" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="text-end d-none d-sm-block me-2">
+                                        <h6 class="mb-0 text-white small">@User.Identity?.Name</h6>
+                                        <small class="text-muted" style="font-size: 0.75rem;">@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value</small>
+                                    </div>
+                                    <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(User.Identity?.Name ?? "User")&background=4F46E5&color=fff&rounded=true" alt="Avatar">
+                                </div>
+                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fa-solid fa-user me-2"></i>Hồ sơ</a></li>
+                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="fa-solid fa-gear me-2"></i>Cài đặt</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="~/Account/Logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="~/Account/Login" class="btn btn-outline-light btn-sm"><i class="fa-solid fa-right-to-bracket me-2"></i> Đăng Nhập</a>
+                        }
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <div class="container-fluid">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i> @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <!-- Render Body from Views -->
+                    @RenderBody()
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer text-center">
+                <div class="container-fluid">
+                    <span class="text-muted">
+                        &copy; @DateTime.Now.Year - Hệ Thống Quản Lý Nhà Thuốc. Thiết kế chuẩn Bootstrap 5.
+                    </span>
+                </div>
+            </footer>
+            
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var sidebarCollapse = document.getElementById('sidebarCollapse');
+            var sidebar = document.getElementById('sidebar');
+
+            if (sidebarCollapse && sidebar) {
+                sidebarCollapse.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Active link based on URL
+            const currentPath = window.location.pathname.toLowerCase();
+            const navLinks = document.querySelectorAll('.nav-link-item');
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href').toLowerCase();
+                const pathParts = linkPath.split('/');
+                const controller = pathParts[pathParts.length - 1] || '/';
+
+                if (linkPath !== '~/' && (currentPath.includes('/' + controller) || currentPath === controller)) {
+                    link.classList.add('active');
+                } else if (linkPath === '~/' && (currentPath === '/' || currentPath === '')) {
+                     link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    @RenderSection("Scripts", required: false)
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-secondary text-white" style="background-color: #1E293B;">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="profileModalLabel"><i class="fa-solid fa-id-card me-2 text-primary"></i>Hồ Sơ Nhân Viên</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(User.Identity?.Name ?? "User")&background=4F46E5&color=fff&size=128&rounded=true" alt="Avatar large" class="shadow mb-3 border border-3 border-primary" style="width: 100px; height: 100px;">
+            <h4 class="mb-1 text-white">@User.Identity?.Name</h4>
+            <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill mb-4">@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value</span>
+            
+            <div class="text-start px-3">
+                <div class="row g-3 py-2 border-bottom border-secondary-subtle">
+                    <div class="col-4 text-muted small text-uppercase">Mã nhân viên</div>
+                    <div class="col-8 fw-bold">@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value</div>
+                </div>
+                <div class="row g-3 py-2 border-bottom border-secondary-subtle">
+                    <div class="col-4 text-muted small text-uppercase">Email hệ thống</div>
+                    <div class="col-8">@User.Identity?.Name.Replace(" ", "").ToLower()@@qlnhathuoc.com</div>
+                </div>
+                <div class="row g-3 py-2 border-bottom border-secondary-subtle">
+                    <div class="col-4 text-muted small text-uppercase">Trạng thái</div>
+                    <div class="col-8"><span class="text-success"><i class="fa-solid fa-circle-check me-1"></i>Đang hoạt động</span></div>
+                </div>
+                <div class="row g-3 py-2">
+                    <div class="col-4 text-muted small text-uppercase">Ca làm việc</div>
+                    <div class="col-8">Ca hành chính (8:00 - 17:30)</div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-secondary text-white" style="background-color: #1E293B;">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="settingsModalLabel"><i class="fa-solid fa-sliders me-2 text-warning"></i>Cài Đặt Hệ Thống</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label text-muted small">Giao diện (Theme)</label>
+                <select class="form-select text-white border-secondary" style="background-color: #0F172A;">
+                    <option value="dark" selected>Sleek Dark Mode (Mặc định)</option>
+                    <option value="light">Vibrant Light Mode</option>
+                </select>
+            </div>
+            <div class="mb-3 form-check form-switch mt-4">
+                <input class="form-check-input" type="checkbox" role="switch" id="notifSwitch" checked>
+                <label class="form-check-label text-white small" for="notifSwitch">Bật thông báo đẩy trên desktop</label>
+            </div>
+            <div class="mb-3 form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="autosaveSwitch" checked>
+                <label class="form-check-label text-white small" for="autosaveSwitch">Tự động sao lưu dữ liệu hóa đơn nháp (mỗi 60s)</label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted small">Ngôn ngữ mặc định</label>
+                <select class="form-select text-white border-secondary" style="background-color: #0F172A;">
+                    <option value="vi" selected>Tiếng Việt</option>
+                    <option value="en">English (US)</option>
+                </select>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-warning text-dark fw-bold px-4" id="btnSaveSettings"><i class="fa-solid fa-save me-1"></i>Lưu cấu hình</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var btnSaveSettings = document.getElementById('btnSaveSettings');
+            if (btnSaveSettings) {
+                btnSaveSettings.addEventListener('click', function() {
+                    var modalEl = document.getElementById('settingsModal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    alert("Đã lưu các cài đặt tùy chỉnh của bạn thành công!");
+                });
+            }
+        });
+    </script>
+
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <!-- ===== PharmaAI Chatbot Widget ===== -->
+        <style>
+            /* ===== Chatbot FAB Button ===== */
+            .pharma-ai-fab {
+                position: fixed;
+                bottom: 28px;
+                right: 28px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #6366F1, #8B5CF6, #A78BFA);
+                border: none;
+                color: #fff;
+                font-size: 24px;
+                cursor: pointer;
+                z-index: 9999;
+                box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45), 0 0 0 0 rgba(99, 102, 241, 0.4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: pharmaAiFabPulse 2.5s ease-in-out infinite;
+            }
+
+            .pharma-ai-fab:hover {
+                transform: scale(1.1) rotate(5deg);
+                box-shadow: 0 8px 32px rgba(99, 102, 241, 0.6);
+            }
+
+            .pharma-ai-fab.active {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+                pointer-events: none;
+                animation: none;
+            }
+
+            .pharma-ai-fab .fab-badge {
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 18px;
+                height: 18px;
+                background: #EF4444;
+                border-radius: 50%;
+                font-size: 10px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid var(--bg-color);
+                animation: pharmaAiBadgeBounce 1.5s ease-in-out infinite;
+            }
+
+            @@keyframes pharmaAiFabPulse {
+                0%, 100% { box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45), 0 0 0 0 rgba(99, 102, 241, 0.3); }
+                50% { box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45), 0 0 0 12px rgba(99, 102, 241, 0); }
+            }
+
+            @@keyframes pharmaAiBadgeBounce {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+            }
+
+            /* ===== Chat Panel ===== */
+            .pharma-ai-panel {
+                position: fixed;
+                bottom: 28px;
+                right: 28px;
+                width: 420px;
+                height: 580px;
+                background: rgba(15, 23, 42, 0.92);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                border-radius: 20px;
+                border: 1px solid rgba(99, 102, 241, 0.25);
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.1);
+                transform: scale(0.4) translateY(40px);
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                transform-origin: bottom right;
+            }
+
+            .pharma-ai-panel.open {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            /* ===== Panel Header ===== */
+            .pharma-ai-header {
+                background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #A78BFA 100%);
+                padding: 16px 20px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .pharma-ai-header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, transparent 60%);
+                animation: pharmaAiHeaderShine 6s ease-in-out infinite;
+            }
+
+            @@keyframes pharmaAiHeaderShine {
+                0%, 100% { transform: translate(-10%, -10%); }
+                50% { transform: translate(10%, 10%); }
+            }
+
+            .pharma-ai-avatar {
+                width: 42px;
+                height: 42px;
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                position: relative;
+                z-index: 1;
+                flex-shrink: 0;
+            }
+
+            .pharma-ai-header-text {
+                flex: 1;
+                position: relative;
+                z-index: 1;
+            }
+
+            .pharma-ai-header-text h6 {
+                margin: 0;
+                font-weight: 700;
+                font-size: 1rem;
+                color: #fff;
+                letter-spacing: 0.3px;
+            }
+
+            .pharma-ai-header-text small {
+                color: rgba(255, 255, 255, 0.75);
+                font-size: 0.75rem;
+            }
+
+            .pharma-ai-status-dot {
+                width: 8px;
+                height: 8px;
+                background: #34D399;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 4px;
+                animation: pharmaAiStatusPulse 2s ease-in-out infinite;
+            }
+
+            @@keyframes pharmaAiStatusPulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+
+            .pharma-ai-close {
+                background: rgba(255, 255, 255, 0.15);
+                border: none;
+                color: #fff;
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                position: relative;
+                z-index: 1;
+                font-size: 14px;
+                flex-shrink: 0;
+            }
+
+            .pharma-ai-close:hover {
+                background: rgba(255, 255, 255, 0.25);
+                transform: rotate(90deg);
+            }
+
+            /* ===== Chat Body ===== */
+            .pharma-ai-body {
+                flex: 1;
+                overflow-y: auto;
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                scroll-behavior: smooth;
+            }
+
+            .pharma-ai-body::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .pharma-ai-body::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .pharma-ai-body::-webkit-scrollbar-thumb {
+                background: rgba(99, 102, 241, 0.3);
+                border-radius: 10px;
+            }
+
+            /* ===== Chat Messages ===== */
+            .pharma-ai-msg {
+                display: flex;
+                gap: 8px;
+                animation: pharmaAiMsgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                opacity: 0;
+                max-width: 100%;
+            }
+
+            .pharma-ai-msg.user {
+                flex-direction: row-reverse;
+            }
+
+            @@keyframes pharmaAiMsgIn {
+                from { opacity: 0; transform: translateY(12px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .pharma-ai-msg-avatar {
+                width: 30px;
+                height: 30px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                flex-shrink: 0;
+            }
+
+            .pharma-ai-msg.bot .pharma-ai-msg-avatar {
+                background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            }
+
+            .pharma-ai-msg.user .pharma-ai-msg-avatar {
+                background: linear-gradient(135deg, #3B82F6, #2563EB);
+            }
+
+            .pharma-ai-bubble {
+                padding: 12px 16px;
+                border-radius: 16px;
+                font-size: 0.88rem;
+                line-height: 1.55;
+                max-width: 85%;
+                word-wrap: break-word;
+                white-space: pre-line;
+            }
+
+            .pharma-ai-msg.bot .pharma-ai-bubble {
+                background: rgba(30, 41, 59, 0.95);
+                border: 1px solid rgba(51, 65, 85, 0.6);
+                color: #E2E8F0;
+                border-top-left-radius: 4px;
+            }
+
+            .pharma-ai-msg.user .pharma-ai-bubble {
+                background: linear-gradient(135deg, #4F46E5, #6366F1);
+                color: #fff;
+                border-top-right-radius: 4px;
+            }
+
+            .pharma-ai-bubble strong {
+                color: #fff;
+            }
+
+            .pharma-ai-msg.bot .pharma-ai-bubble strong {
+                color: #C7D2FE;
+            }
+
+            .pharma-ai-time {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                margin-top: 4px;
+                padding: 0 4px;
+            }
+
+            .pharma-ai-msg.user .pharma-ai-time {
+                text-align: right;
+            }
+
+            /* ===== Typing Indicator ===== */
+            .pharma-ai-typing {
+                display: none;
+                gap: 8px;
+                align-items: flex-end;
+                padding: 0 4px;
+            }
+
+            .pharma-ai-typing.show {
+                display: flex;
+            }
+
+            .pharma-ai-typing-dots {
+                display: flex;
+                gap: 4px;
+                padding: 12px 18px;
+                background: rgba(30, 41, 59, 0.95);
+                border: 1px solid rgba(51, 65, 85, 0.6);
+                border-radius: 16px;
+                border-top-left-radius: 4px;
+            }
+
+            .pharma-ai-typing-dots span {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: #6366F1;
+                animation: pharmaAiTypingBounce 1.4s ease-in-out infinite;
+            }
+
+            .pharma-ai-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+            .pharma-ai-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+            @@keyframes pharmaAiTypingBounce {
+                0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+                30% { transform: translateY(-8px); opacity: 1; }
+            }
+
+            /* ===== Suggestion Chips ===== */
+            .pharma-ai-suggestions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 10px 16px 6px;
+                border-top: 1px solid rgba(51, 65, 85, 0.4);
+            }
+
+            .pharma-ai-chip {
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 0.78rem;
+                font-weight: 500;
+                cursor: pointer;
+                border: 1px solid rgba(99, 102, 241, 0.35);
+                background: rgba(99, 102, 241, 0.08);
+                color: #A5B4FC;
+                transition: all 0.25s ease;
+                white-space: nowrap;
+            }
+
+            .pharma-ai-chip:hover {
+                background: rgba(99, 102, 241, 0.2);
+                border-color: rgba(99, 102, 241, 0.6);
+                color: #C7D2FE;
+                transform: translateY(-1px);
+            }
+
+            /* ===== Input Area ===== */
+            .pharma-ai-input-area {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px 16px;
+                gap: 10px;
+                border-top: 1px solid rgba(51, 65, 85, 0.4);
+                background: rgba(15, 23, 42, 0.6);
+            }
+
+            .pharma-ai-input {
+                flex: 1;
+                background: rgba(30, 41, 59, 0.8);
+                border: 1px solid rgba(51, 65, 85, 0.6);
+                border-radius: 14px;
+                padding: 10px 16px;
+                color: #E2E8F0;
+                font-size: 0.88rem;
+                font-family: 'Inter', sans-serif;
+                outline: none;
+                transition: all 0.25s ease;
+            }
+
+            .pharma-ai-input::placeholder {
+                color: #64748B;
+            }
+
+            .pharma-ai-input:focus {
+                border-color: rgba(99, 102, 241, 0.6);
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            }
+
+            .pharma-ai-send {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+                background: linear-gradient(135deg, #6366F1, #8B5CF6);
+                border: none;
+                color: #fff;
+                font-size: 16px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.25s ease;
+                flex-shrink: 0;
+            }
+
+            .pharma-ai-send:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+            }
+
+            .pharma-ai-send:active {
+                transform: scale(0.95);
+            }
+
+            .pharma-ai-send:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            /* ===== Welcome Message ===== */
+            .pharma-ai-welcome {
+                text-align: center;
+                padding: 20px 10px;
+                animation: pharmaAiMsgIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            }
+
+            .pharma-ai-welcome-icon {
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+                margin: 0 auto 12px;
+                border: 1px solid rgba(99, 102, 241, 0.3);
+            }
+
+            .pharma-ai-welcome h5 {
+                margin: 0 0 6px;
+                font-size: 1rem;
+                font-weight: 700;
+                color: #E2E8F0;
+            }
+
+            .pharma-ai-welcome p {
+                margin: 0;
+                font-size: 0.82rem;
+                color: #94A3B8;
+                line-height: 1.5;
+            }
+
+            /* ===== Responsive ===== */
+            @@media (max-width: 480px) {
+                .pharma-ai-panel {
+                    width: calc(100vw - 16px);
+                    height: calc(100vh - 16px);
+                    bottom: 8px;
+                    right: 8px;
+                    border-radius: 16px;
+                }
+
+                .pharma-ai-fab {
+                    bottom: 20px;
+                    right: 20px;
+                }
+            }
+        </style>
+
+        <!-- FAB Button -->
+        <button class="pharma-ai-fab" id="pharmaAiFab" title="Trợ Lý PharmaAI">
+            <i class="fa-solid fa-robot"></i>
+            <span class="fab-badge">AI</span>
+        </button>
+
+        <!-- Chat Panel -->
+        <div class="pharma-ai-panel" id="pharmaAiPanel">
+            <!-- Header -->
+            <div class="pharma-ai-header">
+                <div class="pharma-ai-avatar">🤖</div>
+                <div class="pharma-ai-header-text">
+                    <h6>Trợ Lý PharmaAI</h6>
+                    <small><span class="pharma-ai-status-dot"></span>Luôn sẵn sàng hỗ trợ</small>
+                </div>
+                <button class="pharma-ai-close" id="pharmaAiClose" title="Đóng">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Chat Body -->
+            <div class="pharma-ai-body" id="pharmaAiBody">
+                <!-- Welcome Message -->
+                <div class="pharma-ai-welcome">
+                    <div class="pharma-ai-welcome-icon">💊</div>
+                    <h5>Xin chào! Tôi là PharmaAI</h5>
+                    <p>Trợ lý thông minh giúp bạn tra cứu tồn kho, doanh thu, sự cố và nhiều hơn nữa.</p>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="pharma-ai-typing" id="pharmaAiTyping">
+                <div class="pharma-ai-msg-avatar" style="background: linear-gradient(135deg, #6366F1, #8B5CF6);">🤖</div>
+                <div class="pharma-ai-typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips -->
+            <div class="pharma-ai-suggestions" id="pharmaAiSuggestions">
+                <span class="pharma-ai-chip" data-q="Thuốc sắp hết">💊 Thuốc sắp hết</span>
+                <span class="pharma-ai-chip" data-q="Doanh thu hôm nay">📊 Doanh thu</span>
+                <span class="pharma-ai-chip" data-q="Sự cố chờ xử lý">⚠️ Sự cố</span>
+                <span class="pharma-ai-chip" data-q="Thống kê kho">📦 Kho hàng</span>
+                <span class="pharma-ai-chip" data-q="Top bán chạy">🏆 Bán chạy</span>
+            </div>
+
+            <!-- Input Area -->
+            <div class="pharma-ai-input-area">
+                <input type="text" class="pharma-ai-input" id="pharmaAiInput" placeholder="Hỏi PharmaAI bất cứ điều gì..." autocomplete="off" />
+                <button class="pharma-ai-send" id="pharmaAiSend" title="Gửi">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chatbot JavaScript -->
+        <script>
+        (function() {
+            const fab = document.getElementById('pharmaAiFab');
+            const panel = document.getElementById('pharmaAiPanel');
+            const closeBtn = document.getElementById('pharmaAiClose');
+            const body = document.getElementById('pharmaAiBody');
+            const input = document.getElementById('pharmaAiInput');
+            const sendBtn = document.getElementById('pharmaAiSend');
+            const typingEl = document.getElementById('pharmaAiTyping');
+            const suggestionsEl = document.getElementById('pharmaAiSuggestions');
+            let isOpen = false;
+            let isProcessing = false;
+
+            // Open/Close
+            fab.addEventListener('click', () => togglePanel(true));
+            closeBtn.addEventListener('click', () => togglePanel(false));
+
+            function togglePanel(open) {
+                isOpen = open;
+                panel.classList.toggle('open', open);
+                fab.classList.toggle('active', open);
+                if (open) {
+                    setTimeout(() => input.focus(), 400);
+                }
+            }
+
+            // Close on Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isOpen) togglePanel(false);
+            });
+
+            // Send message
+            sendBtn.addEventListener('click', sendMessage);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Suggestion chips
+            suggestionsEl.addEventListener('click', (e) => {
+                const chip = e.target.closest('.pharma-ai-chip');
+                if (chip) {
+                    const q = chip.getAttribute('data-q');
+                    input.value = q;
+                    sendMessage();
+                }
+            });
+
+            function sendMessage() {
+                const text = input.value.trim();
+                if (!text || isProcessing) return;
+
+                // Add user message
+                addMessage(text, 'user');
+                input.value = '';
+                isProcessing = true;
+                sendBtn.disabled = true;
+
+                // Show typing
+                showTyping(true);
+
+                // Send to server
+                fetch('/TroLy/HoiDap', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cauHoi: text })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    showTyping(false);
+                    addMessage(data.message, 'bot');
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        updateSuggestions(data.suggestions);
+                    }
+                })
+                .catch(err => {
+                    showTyping(false);
+                    addMessage('❌ Xin lỗi, đã xảy ra lỗi kết nối. Vui lòng thử lại!', 'bot');
+                })
+                .finally(() => {
+                    isProcessing = false;
+                    sendBtn.disabled = false;
+                    input.focus();
+                });
+            }
+
+            function addMessage(content, type) {
+                const now = new Date();
+                const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `pharma-ai-msg ${type}`;
+
+                const avatar = type === 'bot' ? '🤖' : '👤';
+
+                msgDiv.innerHTML = `
+                    <div class="pharma-ai-msg-avatar">${avatar}</div>
+                    <div>
+                        <div class="pharma-ai-bubble">${content}</div>
+                        <div class="pharma-ai-time">${time}</div>
+                    </div>
+                `;
+
+                body.appendChild(msgDiv);
+                scrollToBottom();
+            }
+
+            function showTyping(show) {
+                typingEl.classList.toggle('show', show);
+                if (show) scrollToBottom();
+            }
+
+            function updateSuggestions(suggestions) {
+                const icons = ['💊', '📊', '⚠️', '📦', '🏆', '🔍', '👥', '💰'];
+                suggestionsEl.innerHTML = suggestions.map((s, i) => {
+                    const icon = icons[i % icons.length];
+                    return `<span class="pharma-ai-chip" data-q="${escapeHtml(s)}">${icon} ${escapeHtml(s)}</span>`;
+                }).join('');
+            }
+
+            function scrollToBottom() {
+                requestAnimationFrame(() => {
+                    body.scrollTop = body.scrollHeight;
+                });
+            }
+
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+        })();
+        </script>
+    }
+
+</body>
+</html>

@@ -1,0 +1,439 @@
+@{
+    ViewBag.Title = "Bán Hàng / POS";
+}
+
+<style>
+    .pos-container {
+        height: calc(100vh - 120px);
+        display: flex;
+        gap: 20px;
+    }
+    
+    .products-pane {
+        flex: 6.5;
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+    
+    .cart-pane {
+        flex: 3.5;
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+    }
+    
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        overflow-y: auto;
+        padding-right: 5px;
+        flex: 1;
+    }
+    
+    .product-grid::-webkit-scrollbar { width: 6px; }
+    .product-grid::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
+    
+    .product-card {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .product-card:hover {
+        border-color: var(--primary-color);
+        background: rgba(79, 70, 229, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .product-card h6 {
+        font-size: 0.95rem;
+        margin-bottom: 5px;
+        color: var(--text-main);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .product-card .price {
+        color: #10B981;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .cart-items {
+        flex: 1;
+        overflow-y: auto;
+        margin: 15px 0;
+        padding-right: 5px;
+    }
+    
+    .cart-items::-webkit-scrollbar { width: 4px; }
+    .cart-items::-webkit-scrollbar-thumb { background-color: var(--border-color); }
+    
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px dashed var(--border-color);
+    }
+    
+    .cart-item-info { flex: 1; }
+    .cart-item-title { font-weight: 500; font-size: 0.95rem; }
+    .cart-item-price { color: var(--text-muted); font-size: 0.85rem; }
+    
+    .qty-control {
+        display: flex;
+        align-items: center;
+        background: rgba(0,0,0,0.2);
+        border-radius: 20px;
+        padding: 3px;
+    }
+    
+    .qty-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .qty-btn:hover { background: var(--primary-color); }
+    .qty-input {
+        width: 35px;
+        text-align: center;
+        background: transparent;
+        border: none;
+        color: white;
+        font-weight: 600;
+        -moz-appearance: textfield;
+    }
+    .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    
+    .cart-summary {
+        background: rgba(0,0,0,0.15);
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-color);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #10B981;
+    }
+    
+    .checkout-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #4F46E5 0%, #312E81 100%);
+        border: none;
+        margin-top: 15px;
+        transition: all 0.3s;
+    }
+    .checkout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+    }
+</style>
+
+<div class="pos-container">
+    <!-- Left Pane: Products list -->
+    <div class="products-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 text-white"><i class="fa-solid fa-pills text-primary me-2"></i>Kho Thuốc</h5>
+            <div class="input-group" style="width: 300px;">
+                <span class="input-group-text bg-transparent border-secondary text-muted"><i class="fa-solid fa-search"></i></span>
+                <input type="text" id="searchProduct" class="form-control border-start-0 text-white" style="background-color: var(--bg-color); border-color: var(--border-color);" placeholder="Tìm tên thuốc, mã SP...">
+            </div>
+        </div>
+        
+        <div class="product-grid" id="productGrid">
+            <div class="text-center w-100 mt-5 text-muted">
+                <i class="fa-solid fa-spinner fa-spin fs-2"></i>
+                <p class="mt-2">Đang tải danh sách sản phẩm...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Pane: Cart & Checkout -->
+    <div class="cart-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 text-white"><i class="fa-solid fa-cart-shopping text-primary me-2"></i>Giỏ Hàng</h5>
+            <span class="badge bg-primary rounded-pill" id="cartCountBadge">0</span>
+        </div>
+        
+        <div class="mb-3">
+            <select class="form-select form-select-sm text-white border-secondary shadow-none" id="customerSelect" style="background-color: var(--bg-color);">
+                <option value="">-- Khách lẻ --</option>
+            </select>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <div class="text-center mt-5 text-muted" id="emptyCartMsg">
+                <i class="fa-solid fa-basket-shopping fs-1 opacity-25 mb-3"></i>
+                <p>Giỏ hàng đang trống.</p>
+            </div>
+        </div>
+        
+        <div class="cart-summary">
+            <div class="summary-row text-muted">
+                <span>Tạm tính (<span id="totalItems">0</span> sp)</span>
+                <span id="subTotal">0đ</span>
+            </div>
+            <div class="summary-row text-muted align-items-center">
+                <span>Giảm giá/Khuyến mãi</span>
+                <input type="number" id="discountInput" class="form-control form-control-sm text-end text-white border-secondary shadow-none" style="width: 100px; background-color: var(--bg-color);" value="0" min="0">
+            </div>
+            <div class="total-row">
+                <span>Thành Tiền</span>
+                <span id="finalTotal">0đ</span>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary checkout-btn" id="btnCheckout" disabled>
+            <i class="fa-solid fa-credit-card me-2"></i> THANH TOÁN
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let products = [];
+    let cart = [];
+    
+    // Format currency
+    const formatMoney = (amount) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    };
+
+    $(document).ready(function() {
+        // Load Products
+        $.get('/BanHang/GetSanPhamList', function(data) {
+            products = data;
+            renderProducts(products);
+        }).fail(function(err) {
+            console.error("Lỗi khi tải danh sách sản phẩm:", err);
+            $('#productGrid').html('<div class="col-12 text-center text-danger mt-4">Lỗi khi tải dữ liệu. Vui lòng xem Console.</div>');
+        });
+        
+        // Load Customers
+        $.get('/BanHang/GetKhachHangList', function(data) {
+            data.forEach(c => {
+                $('#customerSelect').append(`<option value="${c.maKH}">${c.hoTen} - ${c.soDT}</option>`);
+            });
+        });
+
+        // Search Filter
+        $('#searchProduct').on('input', function() {
+            var keyword = $(this).val().toLowerCase();
+            var filtered = products.filter(p => 
+                p.tenSP.toLowerCase().includes(keyword) || 
+                p.maSP.toLowerCase().includes(keyword) || 
+                (p.tenDM && p.tenDM.toLowerCase().includes(keyword))
+            );
+            renderProducts(filtered);
+        });
+        
+        // Update discount
+        $('#discountInput').on('change', function() {
+            updateCartSummary();
+        });
+        
+        // Checkout Event
+        $('#btnCheckout').click(function() {
+            if(cart.length === 0) return;
+            
+            $(this).prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
+            
+            const payload = {
+                MaKH: $('#customerSelect').val() || null,
+                PhuongThucThanhToan: "Tiền mặt",
+                DiemSuDung: 0,
+                TienGiamTru: parseFloat($('#discountInput').val()) || 0,
+                Items: cart.map(c => ({
+                    MaSP: c.maSP,
+                    SoLuong: c.qty,
+                    DonGia: c.giaBan,
+                    ThanhTien: c.qty * c.giaBan
+                }))
+            };
+            
+            $.ajax({
+                url: '/BanHang/Checkout',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function(res) {
+                    if(res.success) {
+                        // Redirect đến trang hóa đơn chi tiết
+                        window.location.href = res.redirectUrl;
+                    }
+                },
+                error: function(err) {
+                    let msg = "Có lỗi xảy ra";
+                    if(err.responseJSON && err.responseJSON.message) msg = err.responseJSON.message;
+                    alert("Lỗi: " + msg);
+                },
+                complete: function() {
+                    $('#btnCheckout').prop('disabled', false).html('<i class="fa-solid fa-credit-card me-2"></i> THANH TOÁN');
+                }
+            });
+        });
+    });
+
+    function renderProducts(list) {
+        const grid = $('#productGrid');
+        grid.empty();
+        
+        if (list.length === 0) {
+            grid.html('<div class="col-12 text-center text-muted mt-4">Không tìm thấy sản phẩm phù hợp.</div>');
+            return;
+        }
+        
+        list.forEach(p => {
+            const html = `
+                <div class="product-card" onclick="addToCart('${p.maSP}')">
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">${p.maSP}</small>
+                        <span class="badge ${p.soLuongTonKho > 10 ? 'bg-success' : 'bg-warning'} bg-opacity-25 text-white">Kho: ${p.soLuongTonKho}</span>
+                    </div>
+                    <h6 class="mt-2" title="${p.tenSP}">${p.tenSP}</h6>
+                    <div class="small text-muted mb-1" style="font-size: 0.8rem;"><i class="fa-solid fa-tag me-1"></i>${p.tenDM || 'Chưa phân loại'}</div>
+                    <div class="d-flex justify-content-between align-items-end mt-2">
+                        <div class="price">${formatMoney(p.giaBan)}</div>
+                        <small class="text-muted">/${p.donViTinh || 'Hộp'}</small>
+                    </div>
+                </div>
+            `;
+            grid.append(html);
+        });
+    }
+
+    window.addToCart = function(maSP) {
+        const product = products.find(p => p.maSP === maSP);
+        if (!product) return;
+        
+        const existingItem = cart.find(c => c.maSP === maSP);
+        if (existingItem) {
+            if (existingItem.qty < product.soLuongTonKho) {
+                existingItem.qty++;
+            } else {
+                alert(`Sản phẩm này chỉ còn ${product.soLuongTonKho} trong kho!`);
+            }
+        } else {
+            if (product.soLuongTonKho > 0) {
+                cart.push({ ...product, qty: 1 });
+            } else {
+                alert("Sản phẩm đã hết hàng!");
+            }
+        }
+        renderCart();
+    };
+    
+    window.updateQty = function(maSP, delta) {
+        const item = cart.find(c => c.maSP === maSP);
+        if(!item) return;
+        
+        const product = products.find(p => p.maSP === maSP);
+        
+        let newQty = item.qty + delta;
+        if(newQty > product.soLuongTonKho) {
+            alert(`Sản phẩm này chỉ còn ${product.soLuongTonKho} trong kho!`);
+            return;
+        }
+        if(newQty <= 0) {
+            cart = cart.filter(c => c.maSP !== maSP);
+        } else {
+            item.qty = newQty;
+        }
+        renderCart();
+    };
+
+    function renderCart() {
+        const container = $('#cartItems');
+        if(cart.length === 0) {
+            container.html(`
+                <div class="text-center mt-5 text-muted" id="emptyCartMsg">
+                    <i class="fa-solid fa-basket-shopping fs-1 opacity-25 mb-3"></i>
+                    <p>Giỏ hàng đang trống.</p>
+                </div>
+            `);
+            $('#btnCheckout').prop('disabled', true);
+        } else {
+            container.empty();
+            $('#btnCheckout').prop('disabled', false);
+            cart.forEach(c => {
+                const html = `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${c.tenSP}</div>
+                            <div class="cart-item-price">${formatMoney(c.giaBan)}</div>
+                        </div>
+                        <div class="qty-control ms-3 shadow-sm">
+                            <button class="qty-btn" onclick="updateQty('${c.maSP}', -1)"><i class="fa-solid fa-minus fs-6"></i></button>
+                            <input type="number" class="qty-input" value="${c.qty}" readonly>
+                            <button class="qty-btn" onclick="updateQty('${c.maSP}', 1)"><i class="fa-solid fa-plus fs-6"></i></button>
+                        </div>
+                        <div class="ms-3 fw-bold text-end" style="width: 90px; color: #10B981;">
+                            ${formatMoney(c.giaBan * c.qty)}
+                        </div>
+                    </div>
+                `;
+                container.append(html);
+            });
+        }
+        updateCartSummary();
+    }
+    
+    function updateCartSummary() {
+        let totalItems = 0;
+        let subTotal = 0;
+        
+        cart.forEach(c => {
+            totalItems += c.qty;
+            subTotal += (c.giaBan * c.qty);
+        });
+        
+        let discount = parseFloat($('#discountInput').val()) || 0;
+        let finalTotal = subTotal - discount;
+        if(finalTotal < 0) finalTotal = 0;
+        
+        $('#totalItems').text(totalItems);
+        $('#cartCountBadge').text(totalItems);
+        $('#subTotal').text(formatMoney(subTotal));
+        $('#finalTotal').text(formatMoney(finalTotal));
+    }
+</script>
+}

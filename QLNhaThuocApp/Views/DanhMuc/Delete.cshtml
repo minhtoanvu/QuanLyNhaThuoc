@@ -1,0 +1,47 @@
+@model QLNhaThuoc.DTO.DanhMuc
+
+@{
+    ViewBag.Title = "Xóa Danh Mục Sản Phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6 mt-4">
+        <div class="card bg-dark border-danger shadow-sm rounded-4">
+            <div class="card-header border-danger bg-transparent p-4 pb-0">
+                <h5 class="text-danger mb-0"><i class="fa-solid fa-folder-minus me-2"></i>Xác nhận Xóa Danh Mục</h5>
+            </div>
+            
+            <div class="card-body p-4 text-white">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger mb-4">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
+
+                <p class="fs-5">Bạn có chắc chắn muốn xóa danh mục <strong>@Model.TenDM</strong> không?</p>
+                <div class="bg-secondary bg-opacity-10 p-3 rounded-3 mb-4">
+                    <p class="mb-0 text-muted small">Mã Danh Mục: <span class="text-white">@Model.MaDM</span></p>
+                </div>
+
+                <div class="alert alert-warning border-warning">
+                    <i class="fa-solid fa-link-slash me-2"></i><strong>Lưu ý quan trọng:</strong> Nếu danh mục này đang chứa các sản phẩm, việc xóa sẽ bị cơ sở dữ liệu từ chối để bảo vệ tính toàn vẹn. Vui lòng chuyển các sản phẩm sang danh mục khác trước khi xóa.
+                </div>
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            Hủy bỏ
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa-solid fa-trash me-2"></i> Xóa vĩnh viễn
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
